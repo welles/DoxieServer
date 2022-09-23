@@ -3,12 +3,13 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS restore
 WORKDIR /src
-COPY ["DoxieServer/DoxieServer.csproj", "DoxieServer/"]
-RUN dotnet restore "DoxieServer/DoxieServer.csproj"
 COPY . .
-WORKDIR "/src/DoxieServer"
+WORKDIR /src/DoxieServer
+RUN dotnet restore "DoxieServer.csproj"
+
+FROM restore AS build
 RUN dotnet build "DoxieServer.csproj" -c Release -o /app/build
 
 FROM build AS publish
