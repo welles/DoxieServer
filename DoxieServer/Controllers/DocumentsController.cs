@@ -1,4 +1,3 @@
-using CliWrap;
 using DoxieServer.Authorization;
 using DoxieServer.Core;
 using iText.IO.Image;
