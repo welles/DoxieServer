@@ -4,11 +4,13 @@ public interface IEnvironmentVariables
 {
     public bool PdfEnabled { get; }
 
-    string PdfPath { get; }
+    // string PdfPath { get; }
 
     public bool ImageEnabled { get; }
 
-    string ImagePath { get; }
+    // string ImagePath { get; }
+
+    public string TargetPath { get; }
 
     string Username { get; }
 

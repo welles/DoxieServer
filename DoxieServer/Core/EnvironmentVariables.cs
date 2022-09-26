@@ -12,18 +12,25 @@ public sealed class EnvironmentVariables : IEnvironmentVariables
             throw new ArgumentException("Either PDF_ENABLED or IMAGE_ENABLED environment variable must be set to 'true'");
         }
 
-        this.PdfPath = Environment.GetEnvironmentVariable("PDF_PATH") ?? string.Empty;
+        // this.PdfPath = Environment.GetEnvironmentVariable("PDF_PATH") ?? string.Empty;
+        //
+        // if (this.PdfEnabled && (string.IsNullOrWhiteSpace(this.PdfPath) || !Directory.Exists(this.PdfPath)))
+        // {
+        //     throw new ArgumentException("PDF_PATH environment variable is not set or not a valid path");
+        // }
 
-        if (this.PdfEnabled && (string.IsNullOrWhiteSpace(this.PdfPath) || !Directory.Exists(this.PdfPath)))
+        // this.ImagePath = Environment.GetEnvironmentVariable("IMAGE_PATH") ?? string.Empty;
+        //
+        // if (this.ImageEnabled && (string.IsNullOrWhiteSpace(this.ImagePath) || !Directory.Exists(this.ImagePath)))
+        // {
+        //     throw new ArgumentException("IMAGE_PATH environment variable is not set or not a valid path");
+        // }
+
+        this.TargetPath = Environment.GetEnvironmentVariable("TARGET_PATH") ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(this.TargetPath))
         {
-            throw new ArgumentException("PDF_PATH environment variable is not set or not a valid path");
-        }
-
-        this.ImagePath = Environment.GetEnvironmentVariable("IMAGE_PATH") ?? string.Empty;
-
-        if (this.ImageEnabled && (string.IsNullOrWhiteSpace(this.ImagePath) || !Directory.Exists(this.ImagePath)))
-        {
-            throw new ArgumentException("IMAGE_PATH environment variable is not set or not a valid path");
+            throw new ArgumentException("TARGET_PATH environment variable is not set");
         }
 
         this.Username = Environment.GetEnvironmentVariable("USERNAME") ?? string.Empty;
@@ -43,11 +50,13 @@ public sealed class EnvironmentVariables : IEnvironmentVariables
 
     public bool PdfEnabled { get; }
 
-    public string PdfPath { get; }
+    // public string PdfPath { get; }
 
     public bool ImageEnabled { get; }
 
-    public string ImagePath { get; }
+    // public string ImagePath { get; }
+
+    public string TargetPath { get; }
 
     public string Username { get; }
 
