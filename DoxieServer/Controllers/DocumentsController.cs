@@ -43,12 +43,12 @@ public sealed class DocumentsController : ControllerBase
 
             if (this.EnvironmentVariables.ImageEnabled)
             {
-                var path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, "JPG", fileName + extension);
+                var path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, fileName + extension);
 
                 var attempt = 1;
                 while (System.IO.File.Exists(path))
                 {
-                    path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, "JPG", $"{fileName}_{attempt++}{extension}");
+                    path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, $"{fileName}_{attempt++}{extension}");
                 }
 
                 using var stream = new FileStream(path, FileMode.CreateNew);
@@ -58,12 +58,12 @@ public sealed class DocumentsController : ControllerBase
 
             if (this.EnvironmentVariables.PdfEnabled)
             {
-                var path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, "PDF", fileName + ".pdf");
+                var path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, fileName + ".pdf");
 
                 var attempt = 1;
                 while (System.IO.File.Exists(path))
                 {
-                    path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, "PDF", $"{fileName}_{attempt++}.pdf");
+                    path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, $"{fileName}_{attempt++}.pdf");
                 }
 
                 using var stream = new FileStream(path, FileMode.CreateNew);
