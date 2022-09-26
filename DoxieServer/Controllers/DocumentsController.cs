@@ -23,7 +23,7 @@ public sealed class DocumentsController : ControllerBase
 
     [HttpPost]
     [BasicAuthorization]
-    public async Task<IActionResult> Post([FromForm] IFormFileCollection? document)
+    public IActionResult Post([FromForm] IFormFileCollection? document)
     {
         if (document == null || !document.Any())
         {
@@ -55,10 +55,6 @@ public sealed class DocumentsController : ControllerBase
                 using var stream = new FileStream(path, FileMode.CreateNew);
 
                 formFile.CopyTo(stream);
-
-                await Cli.Wrap("/bin/bash")
-                    .WithArguments(new[] {"-c", $"chmod 0 {path}"})
-                    .ExecuteAsync();
             }
 
             if (this.EnvironmentVariables.PdfEnabled)
@@ -87,10 +83,6 @@ public sealed class DocumentsController : ControllerBase
                 page.Add(image);
 
                 pdf.Close();
-
-                await Cli.Wrap("/bin/bash")
-                    .WithArguments(new[] {"-c", $"chmod 0 {path}"})
-                    .ExecuteAsync();
             }
         }
 
