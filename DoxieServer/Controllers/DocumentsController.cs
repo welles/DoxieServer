@@ -22,8 +22,13 @@ public sealed class DocumentsController : ControllerBase
 
     [HttpPost]
     [BasicAuthorization]
-    public IActionResult Post([FromForm] IFormFileCollection document)
+    public IActionResult Post([FromForm] IFormFileCollection? document)
     {
+        if (document == null || !document.Any())
+        {
+            return this.BadRequest("No document has been supplied");
+        }
+
         if (document.Any(x => x.ContentType != "image/jpeg"))
         {
             return this.BadRequest("Supplied documents must be of content type 'image/jpeg'");
