@@ -54,6 +54,8 @@ public sealed class DocumentsController : ControllerBase
                 using var stream = new FileStream(path, FileMode.CreateNew);
 
                 formFile.CopyTo(stream);
+
+                System.IO.File.SetLastWriteTime(path, DateTime.Now);
             }
 
             if (this.EnvironmentVariables.PdfEnabled)
@@ -82,6 +84,8 @@ public sealed class DocumentsController : ControllerBase
                 page.Add(image);
 
                 pdf.Close();
+
+                System.IO.File.SetLastWriteTime(path, DateTime.Now);
             }
         }
 
