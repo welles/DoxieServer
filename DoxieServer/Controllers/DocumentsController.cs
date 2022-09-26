@@ -1,3 +1,4 @@
+using CliWrap;
 using DoxieServer.Authorization;
 using DoxieServer.Core;
 using iText.IO.Image;
@@ -22,7 +23,7 @@ public sealed class DocumentsController : ControllerBase
 
     [HttpPost]
     [BasicAuthorization]
-    public IActionResult Post([FromForm] IFormFileCollection? document)
+    public async Task<IActionResult> Post([FromForm] IFormFileCollection? document)
     {
         if (document == null || !document.Any())
         {
@@ -55,7 +56,9 @@ public sealed class DocumentsController : ControllerBase
 
                 formFile.CopyTo(stream);
 
-                System.IO.File.SetLastWriteTime(path, DateTime.Now);
+                await Cli.Wrap("/bin/bash")
+                    .WithArguments(new[] {"-c", $"chmod 0 {path}"})
+                    .ExecuteAsync();
             }
 
             if (this.EnvironmentVariables.PdfEnabled)
@@ -85,7 +88,9 @@ public sealed class DocumentsController : ControllerBase
 
                 pdf.Close();
 
-                System.IO.File.SetLastWriteTime(path, DateTime.Now);
+                await Cli.Wrap("/bin/bash")
+                    .WithArguments(new[] {"-c", $"chmod 0 {path}"})
+                    .ExecuteAsync();
             }
         }
 
