@@ -6,6 +6,7 @@ using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using Microsoft.AspNetCore.Mvc;
+using Renci.SshNet;
 
 namespace DoxieServer.Controllers;
 
@@ -15,9 +16,12 @@ public sealed class DocumentsController : ControllerBase
 {
     private IEnvironmentVariables EnvironmentVariables { get; }
 
-    public DocumentsController(IEnvironmentVariables environmentVariables)
+    private ILogger<DocumentsController> Logger { get; }
+
+    public DocumentsController(IEnvironmentVariables environmentVariables, ILogger<DocumentsController> logger)
     {
         this.EnvironmentVariables = environmentVariables;
+        this.Logger = logger;
     }
 
     [HttpPost]
@@ -34,40 +38,57 @@ public sealed class DocumentsController : ControllerBase
             return this.BadRequest("Supplied documents must be of content type 'image/jpeg'");
         }
 
+        using var sftpClient = new SftpClient(this.EnvironmentVariables.SftpHost,
+            this.EnvironmentVariables.SftpPort,
+            this.EnvironmentVariables.SftpUsername,
+            this.EnvironmentVariables.SftpPassword);
+
+        sftpClient.Connect();
+
+        if (!sftpClient.IsConnected)
+        {
+            throw new InvalidOperationException("SFTP Client could not connect");
+        }
+
+        sftpClient.ChangeDirectory(this.EnvironmentVariables.TargetPath);
+
         foreach (var formFile in document)
         {
-            //this.Logger.LogInformation("Received file \'{FileName}\', saving to disk...", formFile.FileName);
-
             var fileName = $"Scan_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}"; // System.IO.Path.GetFileNameWithoutExtension(formFile.FileName);
-            var extension = System.IO.Path.GetExtension(formFile.FileName);
+
+            this.Logger.LogInformation("Received file \'{FileName}\', saving to disk...", fileName);
 
             if (this.EnvironmentVariables.ImageEnabled)
             {
-                var path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, fileName + extension);
+                var path = fileName + ".jpg";
 
                 var attempt = 1;
-                while (System.IO.File.Exists(path))
+                while (sftpClient.Exists(path))
                 {
-                    path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, $"{fileName}_{attempt++}{extension}");
+                    path = $"{fileName}_{attempt++}.jpg";
                 }
 
-                using var stream = new FileStream(path, FileMode.CreateNew);
+                using var stream = new MemoryStream();
 
                 formFile.CopyTo(stream);
+
+                stream.Position = 0;
+                sftpClient.UploadFile(stream, path, false);
             }
 
             if (this.EnvironmentVariables.PdfEnabled)
             {
-                var path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, fileName + ".pdf");
+                var path = fileName + ".pdf";
 
                 var attempt = 1;
-                while (System.IO.File.Exists(path))
+                while (sftpClient.Exists(path))
                 {
-                    path = System.IO.Path.Combine(this.EnvironmentVariables.TargetPath, $"{fileName}_{attempt++}.pdf");
+                    path = $"{fileName}_{attempt++}.pdf";
                 }
 
-                using var stream = new FileStream(path, FileMode.CreateNew);
+                using var stream = new MemoryStream();
                 using var writer = new PdfWriter(stream);
+                writer.SetCloseStream(false);
                 using var pdf = new PdfDocument(writer);
 
                 using var imageStream = new MemoryStream();
@@ -82,8 +103,13 @@ public sealed class DocumentsController : ControllerBase
                 page.Add(image);
 
                 pdf.Close();
+
+                stream.Position = 0;
+                sftpClient.UploadFile(stream, path, false);
             }
         }
+
+        sftpClient.Disconnect();
 
         return this.Ok();
     }

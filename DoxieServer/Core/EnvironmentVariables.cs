@@ -33,6 +33,29 @@ public sealed class EnvironmentVariables : IEnvironmentVariables
             throw new ArgumentException("TARGET_PATH environment variable is not set");
         }
 
+        this.SftpHost = Environment.GetEnvironmentVariable("SFTP_HOST") ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(this.SftpHost))
+        {
+            throw new ArgumentException("SFTP_HOST environment variable is not set");
+        }
+
+        this.SftpPort = int.Parse(Environment.GetEnvironmentVariable("SFTP_PORT") ?? string.Empty);
+
+        this.SftpUsername = Environment.GetEnvironmentVariable("SFTP_USERNAME") ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(this.SftpUsername))
+        {
+            throw new ArgumentException("SFTP_USERNAME environment variable is not set");
+        }
+
+        this.SftpPassword = Environment.GetEnvironmentVariable("SFTP_PASSWORD") ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(this.SftpPassword))
+        {
+            throw new ArgumentException("SFTP_PASSWORD environment variable is not set");
+        }
+
         this.Username = Environment.GetEnvironmentVariable("USERNAME") ?? string.Empty;
 
         if (string.IsNullOrWhiteSpace(this.Username))
@@ -53,6 +76,14 @@ public sealed class EnvironmentVariables : IEnvironmentVariables
     // public string PdfPath { get; }
 
     public bool ImageEnabled { get; }
+
+    public string SftpHost { get; }
+
+    public int SftpPort { get; }
+
+    public string SftpUsername { get; }
+
+    public string SftpPassword { get; }
 
     // public string ImagePath { get; }
 

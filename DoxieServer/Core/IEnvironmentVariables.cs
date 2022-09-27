@@ -12,6 +12,14 @@ public interface IEnvironmentVariables
 
     public string TargetPath { get; }
 
+    public string SftpHost { get; }
+
+    public int SftpPort { get; }
+
+    public string SftpUsername { get; }
+
+    public string SftpPassword { get; }
+
     string Username { get; }
 
     string Password { get; }
