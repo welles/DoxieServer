@@ -7,7 +7,7 @@ public sealed class EnvironmentVariables : IEnvironmentVariables
         this.PdfEnabled = Environment.GetEnvironmentVariable("PDF_ENABLED")?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false;
         this.ImageEnabled = Environment.GetEnvironmentVariable("IMAGE_ENABLED")?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false;
 
-        if (!this.PdfEnabled || !this.ImageEnabled)
+        if (!this.PdfEnabled && !this.ImageEnabled)
         {
             throw new ArgumentException("Either PDF_ENABLED or IMAGE_ENABLED environment variable must be set to 'true'");
         }
