@@ -56,3 +56,8 @@ Most importantly:
 * File Parameter Name must be set to `document` and the optional parameters must be left empty.
 
 ![](/doxie_config.png)
+
+## Checking if the server is running
+
+If you visit the address of the container in your browser you can check if the server is running.
+A successfully configured server should return a message like 'Service is running.' and display the build number of the image.
